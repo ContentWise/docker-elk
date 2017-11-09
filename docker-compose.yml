@@ -6,6 +6,7 @@ services:
     build: elasticsearch/
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -39,7 +40,18 @@ services:
     depends_on:
       - elasticsearch
 
-networks:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.0.0-rc2
+    volumes:
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers/:/var/lib/docker/containers/
+    networks:
+      - elk
 
+volumes:
+  elasticsearch_data:
+
+networks:
   elk:
     driver: bridge
